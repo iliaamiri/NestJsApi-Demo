@@ -8,7 +8,7 @@ import AuthenticationController from './Controllers/User/AuthenticationControlle
 // Providers
 import AuthenticationService from './Services/Authentication/AuthenticationService';
 import TokenService from './Services/Authentication/TokenService';
-import NeedleApiCalls from './Services/Infrastructure/NeedleApiCalls';
+import AxiosApiCalls from './Services/Infrastructure/AxiosApiCalls';
 
 @Module({
   imports: [ConfigModule.forRoot()],
@@ -16,7 +16,7 @@ import NeedleApiCalls from './Services/Infrastructure/NeedleApiCalls';
   providers: [
     {
       provide: 'IApiCalls',
-      useClass: NeedleApiCalls,
+      useClass: AxiosApiCalls,
     },
     {
       provide: 'ITokenService',

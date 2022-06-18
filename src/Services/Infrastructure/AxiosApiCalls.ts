@@ -2,13 +2,17 @@ import IApiCalls from './IApiCalls';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, Scope } from '@nestjs/common';
+import PokerVancApiAuthorizationHeaders from '../../Models/StaticModels/PokerVancApiAuthorizationHeadersFields';
 
 @Injectable({ scope: Scope.DEFAULT })
-class ApiCalls implements IApiCalls {
+class AxiosApiCalls implements IApiCalls {
   public AppApiBaseUrl = this._configService.get('APP_API_BASE_URL');
 
   public AuthorizationHeaders = {
-    'PokerVanc-ProviderId': this._configService.get('APP_PROVIDER_ID'),
+    [PokerVancApiAuthorizationHeaders.FieldNames.ProviderId]:
+      this._configService.get('APP_PROVIDER_ID'),
+    [PokerVancApiAuthorizationHeaders.FieldNames.ProviderSignature]:
+      this._configService.get('APP_PROVIDER_SIGNATURE'),
     //'Authorization': `Bearer ${tokenBearer}`,
   };
 
@@ -49,4 +53,4 @@ class ApiCalls implements IApiCalls {
   }
 }
 
-export default ApiCalls;
+export default AxiosApiCalls;
