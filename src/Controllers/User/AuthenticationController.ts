@@ -1,25 +1,35 @@
 import {
   BadRequestException,
   Body,
-  Controller,
+  Controller, Inject,
   Post,
   Req,
   Res,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
-import AuthenticationService from '../../Services/Authentication/AuthenticationService';
-import ApiCalls from '../../Services/Infrastructure/ApiCalls';
+import IAuthenticationService from '../../Services/Authentication/IAuthenticationService';
+import IApiCalls from '../../Services/Infrastructure/IApiCalls';
 
 import LoginPayloadDTO from '../../Models/LoginPayloadDTO';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiOkResponse,
+  ApiResponse,
+  ApiTags,
+  getSchemaPath,
+} from '@nestjs/swagger';
+import AuthenticatedUserDTO from '../../Models/AuthenticatedUserDTO';
 
 @ApiTags('auth')
+@ApiExtraModels(AuthenticatedUserDTO)
 @Controller('auth')
 export default class AuthenticationController {
   constructor(
-    private readonly _authenticationService: AuthenticationService,
-    private readonly _apiCalls: ApiCalls,
+    @Inject('IAuthenticationService')
+    private readonly _authenticationService: IAuthenticationService,
+    @Inject('IApiCalls')
+    private readonly _apiCalls: IApiCalls,
   ) {}
 
   @Post('/authenticate')
@@ -29,13 +39,20 @@ export default class AuthenticationController {
   ): Promise<any> {}
 
   @Post('/login')
+  @ApiOkResponse({
+    schema: {
+      $ref: getSchemaPath(AuthenticatedUserDTO),
+    },
+    description: 'User is logged-in.',
+  })
+  @ApiResponse({ status: 403, description: 'User is NOT logged-in' })
   public async loginTrackedUser(@Body() LoginPayloadDTO: LoginPayloadDTO) {
+    console.log('hit the /login endpoint');
     if (!LoginPayloadDTO.Username || !LoginPayloadDTO.PasswordHashed) {
       throw new BadRequestException('Bad input');
     }
 
-    const loginTrackedUser_Result =
-      await this._authenticationService.loginTrackedUser(LoginPayloadDTO);
+    return await this._authenticationService.loginTrackedUser(LoginPayloadDTO);
   }
 
   @Post('/register')

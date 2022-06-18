@@ -17,7 +17,6 @@ export default class SwaggerConfig {
         'Apache 2.0',
         'https://www.apache.org/licenses/LICENSE-2.0.html',
       )
-      .setBasePath('/api/v1')
       .addBearerAuth({
         type: 'apiKey',
         in: 'header',
@@ -25,7 +24,7 @@ export default class SwaggerConfig {
         description: 'Bearer token',
         bearerFormat: 'Bearer {token}',
       })
-      .addServer('http://localhost:8080/api/v1')
+      .addServer('http://localhost:8080')
       .build();
   }
 }

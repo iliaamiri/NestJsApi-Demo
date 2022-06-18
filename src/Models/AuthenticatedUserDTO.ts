@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import Decimal from 'decimal.js';
+import { IsDecimal } from 'class-validator';
 
 export default class AuthenticatedUserDTO {
   // JWT token as a string
@@ -14,7 +16,17 @@ export default class AuthenticatedUserDTO {
   @ApiProperty()
   RealMoneyMode: boolean;
 
-  // TODO: Money Data-Type
-  @ApiProperty()
-  CurrentBalance: string;
+  @ApiProperty({
+    type: 'string',
+    format: 'decimal',
+  })
+  @IsDecimal({ force_decimal: true })
+  CurrentRealMoneyBalance: string;
+
+  @ApiProperty({
+    type: 'string',
+    format: 'decimal',
+  })
+  @IsDecimal({ force_decimal: true })
+  CurrentPlayMoneyBalance: string;
 }

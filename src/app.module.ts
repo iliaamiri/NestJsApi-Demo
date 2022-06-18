@@ -6,13 +6,26 @@ import { ConfigModule } from '@nestjs/config';
 import AuthenticationController from './Controllers/User/AuthenticationController';
 
 // Providers
-import ApiCalls from './Services/Infrastructure/ApiCalls';
 import AuthenticationService from './Services/Authentication/AuthenticationService';
 import TokenService from './Services/Authentication/TokenService';
+import NeedleApiCalls from './Services/Infrastructure/NeedleApiCalls';
 
 @Module({
   imports: [ConfigModule.forRoot()],
   controllers: [AuthenticationController],
-  providers: [ApiCalls, TokenService, AuthenticationService],
+  providers: [
+    {
+      provide: 'IApiCalls',
+      useClass: NeedleApiCalls,
+    },
+    {
+      provide: 'ITokenService',
+      useClass: TokenService,
+    },
+    {
+      provide: 'IAuthenticationService',
+      useClass: AuthenticationService,
+    },
+  ],
 })
 export class AppModule {}

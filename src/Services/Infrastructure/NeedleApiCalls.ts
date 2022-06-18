@@ -1,10 +1,10 @@
 import IApiCalls from './IApiCalls';
-import axios from 'axios';
+import needle from 'needle';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, Scope } from '@nestjs/common';
 
 @Injectable({ scope: Scope.DEFAULT })
-class ApiCalls implements IApiCalls {
+class NeedleApiCalls implements IApiCalls {
   public AppApiBaseUrl = this._configService.get('APP_API_BASE_URL');
 
   public AuthorizationHeaders = {
@@ -15,31 +15,44 @@ class ApiCalls implements IApiCalls {
   constructor(private _configService: ConfigService) {}
 
   async get(url: string, headers?: any): Promise<any> {
-    return axios.get(this.makeApiUrl(url), {
-      headers: { ...this.AuthorizationHeaders, ...headers },
-    });
+    return needle(
+      'get',
+      this.makeApiUrl(url),
+      {},
+      {
+        headers: { ...this.AuthorizationHeaders, ...headers },
+      },
+    );
   }
 
   async post(url: string, data: object, headers?: any): Promise<any> {
-    return axios.post(this.makeApiUrl(url), data, {
+    return needle('post', this.makeApiUrl(url), data, {
+      json: true,
       headers: { ...this.AuthorizationHeaders, ...headers },
     });
   }
 
   async put(url: string, data: object, headers?: any): Promise<any> {
-    return axios.put(this.makeApiUrl(url), data, {
+    return needle('put', this.makeApiUrl(url), data, {
+      json: true,
       headers: { ...this.AuthorizationHeaders, ...headers },
     });
   }
 
   async delete(url: string, headers?: any): Promise<any> {
-    return axios.delete(this.makeApiUrl(url), {
-      headers: { ...this.AuthorizationHeaders, ...headers },
-    });
+    return needle(
+      'delete',
+      this.makeApiUrl(url),
+      {},
+      {
+        headers: { ...this.AuthorizationHeaders, ...headers },
+      },
+    );
   }
 
   async patch(url: string, data: object, headers?: any): Promise<any> {
-    return axios.patch(this.makeApiUrl(url), data, {
+    return needle('patch', this.makeApiUrl(url), data, {
+      json: true,
       headers: { ...this.AuthorizationHeaders, ...headers },
     });
   }
@@ -49,4 +62,4 @@ class ApiCalls implements IApiCalls {
   }
 }
 
-export default ApiCalls;
+export default NeedleApiCalls;

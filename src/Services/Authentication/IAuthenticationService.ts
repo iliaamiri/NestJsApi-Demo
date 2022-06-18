@@ -9,7 +9,7 @@ export default interface IAuthenticationService {
 
   loginTrackedUser(
     loginPayload: LoginPayloadDTO,
-  ): Promise<HttpException | AuthenticatedUserDTO>;
+  ): Promise<AuthenticatedUserDTO>;
 
   register(
     registerPayload: RegisterPayloadDTO,
