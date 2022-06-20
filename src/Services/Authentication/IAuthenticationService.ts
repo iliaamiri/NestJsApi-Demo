@@ -13,5 +13,5 @@ export default interface IAuthenticationService {
 
   register(
     registerPayload: RegisterPayloadDTO,
-  ): Promise<HttpException | AuthenticatedUserDTO>;
+  ): Promise<HttpException | RegisterPayloadDTO>;
 }

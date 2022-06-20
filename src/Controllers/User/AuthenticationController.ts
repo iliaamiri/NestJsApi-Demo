@@ -1,7 +1,8 @@
 import {
   BadRequestException,
   Body,
-  Controller, Inject,
+  Controller,
+  Inject,
   Post,
   Req,
   Res,
@@ -9,9 +10,10 @@ import {
 import { Request, Response } from 'express';
 
 import IAuthenticationService from '../../Services/Authentication/IAuthenticationService';
-import IApiCalls from '../../Services/Infrastructure/IApiCalls';
+import IApiCalls from '../../Services/Infrastructure/ApiCalls/IApiCalls';
 
 import LoginPayloadDTO from '../../Models/LoginPayloadDTO';
+import RegisterPayloadDTO from '../../Models/RegisterPayloadDTO';
 import {
   ApiExtraModels,
   ApiOkResponse,
@@ -46,17 +48,18 @@ export default class AuthenticationController {
     description: 'User is logged-in.',
   })
   @ApiResponse({ status: 403, description: 'User is NOT logged-in' })
-  public async loginTrackedUser(@Body() LoginPayloadDTO: LoginPayloadDTO) {
+  public async loginTrackedUser(@Body() loginPayloadDTO: LoginPayloadDTO) {
     console.log('hit the /login endpoint');
-    if (!LoginPayloadDTO.Username || !LoginPayloadDTO.PasswordHashed) {
-      throw new BadRequestException('Bad input');
-    }
 
-    return await this._authenticationService.loginTrackedUser(LoginPayloadDTO);
+    return await this._authenticationService.loginTrackedUser(loginPayloadDTO);
   }
 
   @Post('/register')
-  public async register(@Req() req: Request) {}
+  public async register(@Body() registerPayloadDTO: RegisterPayloadDTO) {
+    console.log('hit the /register endpoint');
+
+    return await this._authenticationService.register(registerPayloadDTO);
+  }
 
   @Post('/logout')
   public async logout(@Req() req: Request) {}

@@ -8,12 +8,17 @@ import AuthenticationController from './Controllers/User/AuthenticationControlle
 // Providers
 import AuthenticationService from './Services/Authentication/AuthenticationService';
 import TokenService from './Services/Authentication/TokenService';
-import AxiosApiCalls from './Services/Infrastructure/AxiosApiCalls';
+import AxiosApiCalls from './Services/Infrastructure/ApiCalls/AxiosApiCalls';
+import AxiosApiCallsExceptionHandler from './Services/Infrastructure/ApiCallsExceptionHandler/AxiosApiCallsExceptionHandler';
 
 @Module({
   imports: [ConfigModule.forRoot()],
   controllers: [AuthenticationController],
   providers: [
+    {
+      provide: 'IApiCallsExceptionHandler',
+      useClass: AxiosApiCallsExceptionHandler,
+    },
     {
       provide: 'IApiCalls',
       useClass: AxiosApiCalls,

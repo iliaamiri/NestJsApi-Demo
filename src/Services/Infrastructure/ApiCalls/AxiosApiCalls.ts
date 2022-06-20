@@ -2,7 +2,7 @@ import IApiCalls from './IApiCalls';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { Injectable, Scope } from '@nestjs/common';
-import PokerVancApiAuthorizationHeaders from '../../Models/StaticModels/PokerVancApiAuthorizationHeadersFields';
+import PokerVancApiAuthorizationHeaders from '../../../Models/StaticModels/PokerVancApiAuthorizationHeadersFields';
 
 @Injectable({ scope: Scope.DEFAULT })
 class AxiosApiCalls implements IApiCalls {

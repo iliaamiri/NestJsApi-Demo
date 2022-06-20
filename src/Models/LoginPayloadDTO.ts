@@ -3,6 +3,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export default class LoginPayloadDTO {
   @ApiProperty()
+  @IsNotEmpty()
   Username: string;
 
   @ApiProperty()
