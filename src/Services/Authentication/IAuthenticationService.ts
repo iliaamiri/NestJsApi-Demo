@@ -1,17 +1,15 @@
-import AuthenticatedUserDTO from '../../models/AuthenticatedUserDTO';
+import AuthenticatedUser from '../../Models/AuthenticatedUser';
 import LoginPayloadDTO from '../../models/LoginPayloadDTO';
 import RegisterPayloadDTO from '../../models/RegisterPayloadDTO';
 
 import { HttpException } from '@nestjs/common';
 
 export default interface IAuthenticationService {
-  authenticate(token: string): Promise<HttpException | AuthenticatedUserDTO>;
+  Authenticate(token: string): Promise<HttpException | AuthenticatedUser>;
 
-  loginTrackedUser(
-    loginPayload: LoginPayloadDTO,
-  ): Promise<AuthenticatedUserDTO>;
+  LoginTrackedUser(loginPayload: LoginPayloadDTO): Promise<AuthenticatedUser>;
 
-  register(
+  Register(
     registerPayload: RegisterPayloadDTO,
   ): Promise<HttpException | RegisterPayloadDTO>;
 }

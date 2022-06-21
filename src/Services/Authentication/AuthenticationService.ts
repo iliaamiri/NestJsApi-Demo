@@ -1,13 +1,15 @@
 import IAuthenticationService from './IAuthenticationService';
-import AuthenticatedUserDTO from '../../models/AuthenticatedUserDTO';
+import AuthenticatedUser from '../../Models/AuthenticatedUser';
 import LoginPayloadDTO from '../../models/LoginPayloadDTO';
 import RegisterPayloadDTO from '../../models/RegisterPayloadDTO';
 
 import { HttpException, Inject, Injectable, Scope } from '@nestjs/common';
 
 import IApiCalls from '../Infrastructure/ApiCalls/IApiCalls';
-import ITokenService from './ITokenService';
+import ITokenService from './TokenService/ITokenService';
 import IApiCallsExceptionHandler from '../Infrastructure/ApiCallsExceptionHandler/IApiCallsExceptionHandler';
+import ErrorMessage from '../../Models/ErrorMessage';
+import { DateTime } from 'luxon';
 
 @Injectable({ scope: Scope.REQUEST })
 class AuthenticationService implements IAuthenticationService {
@@ -18,15 +20,15 @@ class AuthenticationService implements IAuthenticationService {
     private _apiCallsExceptionHandler: IApiCallsExceptionHandler,
   ) {}
 
-  public async authenticate(
+  public async Authenticate(
     token: string,
-  ): Promise<HttpException | AuthenticatedUserDTO> {
-    return Promise.resolve({} as AuthenticatedUserDTO);
+  ): Promise<HttpException | AuthenticatedUser> {
+    return Promise.resolve({} as AuthenticatedUser);
   }
 
-  public async loginTrackedUser(
+  public async LoginTrackedUser(
     loginPayload: LoginPayloadDTO,
-  ): Promise<AuthenticatedUserDTO> {
+  ): Promise<AuthenticatedUser> {
     try {
       // Login the user and sign the JWT token.
       const apiResponse = await this._apiCalls.post(
@@ -34,16 +36,32 @@ class AuthenticationService implements IAuthenticationService {
         loginPayload,
       );
 
-      const response = apiResponse.data;
-      console.log('Data Response: ', response);
+      // App backend is putting full trust on the structure of the response.
+      const authenticatedUser = apiResponse.data as AuthenticatedUser;
 
-      return Promise.resolve({} as AuthenticatedUserDTO);
+      authenticatedUser.JWT = await this._tokenService.Create(
+        authenticatedUser,
+        DateTime.now().plus({ days: 1 }),
+      );
+
+      console.log(authenticatedUser);
+
+      return authenticatedUser;
     } catch (error) {
-      await this._apiCallsExceptionHandler.handle(error);
+      await this._apiCallsExceptionHandler.Handle(
+        error,
+        (errorJSON: ErrorMessage) => {
+          console.log('Login | Error JSON: ', errorJSON);
+          return {
+            statusCode: errorJSON.statusCode,
+            message: 'Invalid credentials',
+          };
+        },
+      );
     }
   }
 
-  public async register(
+  public async Register(
     registerPayload: RegisterPayloadDTO,
   ): Promise<HttpException | RegisterPayloadDTO> {
     try {
@@ -59,7 +77,7 @@ class AuthenticationService implements IAuthenticationService {
         return registerPayload;
       }
     } catch (error) {
-      await this._apiCallsExceptionHandler.handle(error);
+      await this._apiCallsExceptionHandler.Handle(error);
     }
   }
 }

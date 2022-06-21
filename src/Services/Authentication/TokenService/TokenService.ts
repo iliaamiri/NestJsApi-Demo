@@ -3,11 +3,12 @@ import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import { rootPath } from 'get-root-path';
 
-import UserDTO from '../../models/UserDTO';
-import JWTTokenRawDataDTO from '../../models/JWTTokenRawDataDTO';
-import TokenDTO from '../../models/TokenDTO';
+import AuthenticatedUser from '../../../Models/AuthenticatedUser';
+import JWTTokenRawDataDTO from '../../../Models/JWTTokenRawDataDTO';
+import TokenDTO from '../../../Models/TokenDTO';
 import ITokenService from './ITokenService';
-import { Injectable, Scope } from '@nestjs/common';
+import { Inject, Injectable, Scope } from '@nestjs/common';
+import ITokenRepository from '../TokenRepository/ITokenRepository';
 
 const makeTokenModel = (
   userId: number,
@@ -23,67 +24,68 @@ const makeTokenModel = (
 
 @Injectable({ scope: Scope.DEFAULT })
 class TokenService implements ITokenService {
-  public allTokens = new Map<string, TokenDTO>();
+  constructor(
+    @Inject('ITokenRepository') private _tokenRepository: ITokenRepository,
+  ) {}
 
-  private static async getPrivateKey(): Promise<string> {
-    return fs.readFileSync(rootPath + 'jwtRS256.key').toString();
-  }
-
-  private static async getPublicKey(): Promise<string> {
-    return fs.readFileSync(rootPath + 'jwtRS256.key.pub').toString();
-  }
-
-  public async create(
-    user: UserDTO,
+  public async Create(
+    user: AuthenticatedUser,
     expiresIn: DateTime = DateTime.now().plus({ day: 1 }),
   ): Promise<string | null> {
     // Getting the timestamp for the expiry date.
     const expiresInTimestamp = expiresIn.valueOf();
 
-    let newJwtToken = '';
+    const newJwtToken = await TokenService.GenerateToken(
+      user,
+      expiresInTimestamp,
+    );
+
+    await this._tokenRepository.AddToken(newJwtToken, {
+      UserId: user.UserId,
+      Username: user.Username,
+      CreatedAt: Date.now(),
+      ExpiryDate: expiresInTimestamp,
+    });
+
+    return newJwtToken;
+  }
+
+  private static async GenerateToken(
+    user: AuthenticatedUser,
+    expiresInTimestamp: number,
+  ): Promise<string> {
     // For some reason I don't know, JWT library throws an error when running for the first time.
     // So, this for loop tries to re-try the process so that it always works regardless.
     for (let i = 0; i < 2; i++) {
       try {
         const payload: JWTTokenRawDataDTO = {
-          UserId: user.Id,
+          UserId: user.UserId,
           Username: user.Username,
           CreatedAt: Date.now(),
+          ExpiryDate: expiresInTimestamp,
         };
-        const privateKey: string = await TokenService.getPrivateKey();
+        const privateKey: string = await TokenService.GetPrivateKey();
         const options: jwt.SignOptions = {
           algorithm: 'RS256',
           expiresIn: expiresInTimestamp,
         };
 
-        newJwtToken = jwt.sign(
+        return jwt.sign(
           payload,
           privateKey, // Private Key loaded from jwtRS256.key file.
           options,
         );
-
-        break;
       } catch (err) {
         console.debug(err); // debug 🤷
       }
     }
-
-    const newTokenObject = makeTokenModel(
-      user.Id,
-      newJwtToken,
-      expiresInTimestamp,
-    );
-
-    this.allTokens.set(newJwtToken, newTokenObject);
-
-    return newJwtToken;
   }
 
-  async verifyIntegrity(
+  public async VerifyIntegrity(
     tokenValue: string,
   ): Promise<false | JWTTokenRawDataDTO> {
     try {
-      const publicKey: string = await TokenService.getPublicKey();
+      const publicKey: string = await TokenService.GetPublicKey();
       const options = {
         complete: true,
         algorithms: ['RS256'],
@@ -111,9 +113,17 @@ class TokenService implements ITokenService {
     return false;
   }
 
-  async revoke(tokenValue: string): Promise<boolean> {
-    this.allTokens.delete(tokenValue);
+  public async Revoke(tokenValue: string): Promise<boolean> {
+    await this._tokenRepository.RemoveToken(tokenValue);
     return true;
+  }
+
+  private static async GetPrivateKey(): Promise<string> {
+    return fs.readFileSync(rootPath + '/jwtRS256.key').toString();
+  }
+
+  private static async GetPublicKey(): Promise<string> {
+    return fs.readFileSync(rootPath + '/jwtRS256.key.pub').toString();
   }
 }
 

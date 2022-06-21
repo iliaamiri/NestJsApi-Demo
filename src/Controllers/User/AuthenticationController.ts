@@ -21,10 +21,10 @@ import {
   ApiTags,
   getSchemaPath,
 } from '@nestjs/swagger';
-import AuthenticatedUserDTO from '../../Models/AuthenticatedUserDTO';
+import AuthenticatedUser from '../../Models/AuthenticatedUser';
 
 @ApiTags('auth')
-@ApiExtraModels(AuthenticatedUserDTO)
+@ApiExtraModels(AuthenticatedUser)
 @Controller('auth')
 export default class AuthenticationController {
   constructor(
@@ -34,7 +34,7 @@ export default class AuthenticationController {
     private readonly _apiCalls: IApiCalls,
   ) {}
 
-  @Post('/authenticate')
+  @Post('/Authenticate')
   public async authenticate(
     @Req() req: Request,
     @Res() res: Response,
@@ -43,7 +43,7 @@ export default class AuthenticationController {
   @Post('/login')
   @ApiOkResponse({
     schema: {
-      $ref: getSchemaPath(AuthenticatedUserDTO),
+      $ref: getSchemaPath(AuthenticatedUser),
     },
     description: 'User is logged-in.',
   })
@@ -51,14 +51,14 @@ export default class AuthenticationController {
   public async loginTrackedUser(@Body() loginPayloadDTO: LoginPayloadDTO) {
     console.log('hit the /login endpoint');
 
-    return await this._authenticationService.loginTrackedUser(loginPayloadDTO);
+    return await this._authenticationService.LoginTrackedUser(loginPayloadDTO);
   }
 
-  @Post('/register')
+  @Post('/Register')
   public async register(@Body() registerPayloadDTO: RegisterPayloadDTO) {
-    console.log('hit the /register endpoint');
+    console.log('hit the /Register endpoint');
 
-    return await this._authenticationService.register(registerPayloadDTO);
+    return await this._authenticationService.Register(registerPayloadDTO);
   }
 
   @Post('/logout')

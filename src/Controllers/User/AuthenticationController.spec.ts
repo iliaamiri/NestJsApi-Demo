@@ -15,4 +15,10 @@ describe('AuthenticationController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
+  describe('authenticate', () => {
+    it('should return a user', () => {
+      // expect(controller.Authenticate()).toBe('Hello World!');
+    });
+  });
 });

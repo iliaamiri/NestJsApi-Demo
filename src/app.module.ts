@@ -7,9 +7,10 @@ import AuthenticationController from './Controllers/User/AuthenticationControlle
 
 // Providers
 import AuthenticationService from './Services/Authentication/AuthenticationService';
-import TokenService from './Services/Authentication/TokenService';
+import TokenService from './Services/Authentication/TokenService/TokenService';
 import AxiosApiCalls from './Services/Infrastructure/ApiCalls/AxiosApiCalls';
 import AxiosApiCallsExceptionHandler from './Services/Infrastructure/ApiCallsExceptionHandler/AxiosApiCallsExceptionHandler';
+import TokenRepository from './Services/Authentication/TokenRepository/TokenRepository';
 
 @Module({
   imports: [ConfigModule.forRoot()],
@@ -18,6 +19,10 @@ import AxiosApiCallsExceptionHandler from './Services/Infrastructure/ApiCallsExc
     {
       provide: 'IApiCallsExceptionHandler',
       useClass: AxiosApiCallsExceptionHandler,
+    },
+    {
+      provide: 'ITokenRepository',
+      useClass: TokenRepository,
     },
     {
       provide: 'IApiCalls',

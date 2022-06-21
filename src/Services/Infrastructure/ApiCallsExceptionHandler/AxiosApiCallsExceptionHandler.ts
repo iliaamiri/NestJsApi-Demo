@@ -4,10 +4,16 @@ import { HttpException } from '@nestjs/common';
 export default class AxiosApiCallsExceptionHandler
   implements IApiCallsExceptionHandler
 {
-  public async handle(error: any): Promise<HttpException | void> {
+  public async Handle(
+    error: any,
+    customErrorObjectCallback: any = this.defaultCustomErrorObjectCallback,
+  ): Promise<HttpException | void> {
     if (error.response && error.response.data) {
       const errorJSON = error.response.data;
-      throw new HttpException(errorJSON, errorJSON.statusCode);
+      throw new HttpException(
+        customErrorObjectCallback(errorJSON),
+        errorJSON.statusCode,
+      );
     } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
@@ -26,5 +32,12 @@ export default class AxiosApiCallsExceptionHandler
     }
     console.log(`Unexpected Error: `, error);
     console.log(error.config);
+  }
+
+  private async defaultCustomErrorObjectCallback(errorJSON: any): Promise<any> {
+    return {
+      statusCode: errorJSON.statusCode,
+      message: errorJSON.message,
+    };
   }
 }

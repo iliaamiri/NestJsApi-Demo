@@ -1,5 +1,8 @@
 import { HttpException } from '@nestjs/common';
 
 export default interface IApiCallsExceptionHandler {
-  handle(error: any): Promise<HttpException | void>;
+  Handle(
+    error: any,
+    customErrorObjectCallback?: any,
+  ): Promise<HttpException | void>;
 }

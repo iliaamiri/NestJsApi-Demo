@@ -2,10 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import Decimal from 'decimal.js';
 import { IsDecimal } from 'class-validator';
 
-export default class AuthenticatedUserDTO {
+export default class AuthenticatedUser {
   // JWT token as a string
   @ApiProperty()
-  JWT: string;
+  JWT?: string;
 
   @ApiProperty()
   UserId: number;
