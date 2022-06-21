@@ -37,10 +37,16 @@ class AuthenticationService implements IAuthenticationService {
       );
 
       // App backend is putting full trust on the structure of the response.
-      const authenticatedUser = apiResponse.data as AuthenticatedUser;
+      const authenticatedUser = apiResponse.data;
 
       authenticatedUser.JWT = await this._tokenService.Create(
-        authenticatedUser,
+        {
+          UserId: authenticatedUser.userId,
+          Username: authenticatedUser.username,
+          RealMoneyMode: authenticatedUser.realMoneyMode,
+          CurrentRealMoneyBalance: authenticatedUser.currentRealMoneyBalance,
+          CurrentPlayMoneyBalance: authenticatedUser.currentPlayMoneyBalance,
+        } as AuthenticatedUser,
         DateTime.now().plus({ days: 1 }),
       );
 

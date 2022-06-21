@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 
 import { ConfigModule } from '@nestjs/config';
 
@@ -11,6 +16,7 @@ import TokenService from './Services/Authentication/TokenService/TokenService';
 import AxiosApiCalls from './Services/Infrastructure/ApiCalls/AxiosApiCalls';
 import AxiosApiCallsExceptionHandler from './Services/Infrastructure/ApiCallsExceptionHandler/AxiosApiCallsExceptionHandler';
 import TokenRepository from './Services/Authentication/TokenRepository/TokenRepository';
+import AuthenticationMiddleware from './Middlewares/AuthenticationMiddleware';
 
 @Module({
   imports: [ConfigModule.forRoot()],
@@ -39,3 +45,16 @@ import TokenRepository from './Services/Authentication/TokenRepository/TokenRepo
   ],
 })
 export class AppModule {}
+
+// FOR MIDDLEWARES
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(AuthenticationMiddleware)
+//       .exclude(
+//         { path: `(.*)/login`, method: RequestMethod.POST },
+//         { path: `(.*)/register`, method: RequestMethod.POST },
+//       )
+//       .forRoutes(AuthenticationController);
+//   }
+// }

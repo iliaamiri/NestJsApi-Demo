@@ -1,7 +1,7 @@
 export default interface ITokenRepository {
   AddToken(tokenValue: string, tokenObject: any): Promise<boolean>;
 
-  GetToken(tokenValue: string): Promise<undefined | any>;
+  GetToken(tokenValue: string): Promise<any | false>;
 
   RemoveToken(tokenValue: string): Promise<boolean>;
 

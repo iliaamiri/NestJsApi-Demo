@@ -6,6 +6,7 @@ import {
   Post,
   Req,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -22,6 +23,8 @@ import {
   getSchemaPath,
 } from '@nestjs/swagger';
 import AuthenticatedUser from '../../Models/AuthenticatedUser';
+import AuthenticationGuard from '../../Guards/AuthenticationGuard';
+import StrictAuthenticationGuard from '../../Guards/StrictAuthenticationGuard';
 
 @ApiTags('auth')
 @ApiExtraModels(AuthenticatedUser)
@@ -34,11 +37,13 @@ export default class AuthenticationController {
     private readonly _apiCalls: IApiCalls,
   ) {}
 
-  @Post('/Authenticate')
-  public async authenticate(
-    @Req() req: Request,
-    @Res() res: Response,
-  ): Promise<any> {}
+  @Post('/authenticate')
+  @ApiResponse({ status: 403, description: 'User is NOT logged-in' })
+  @UseGuards(AuthenticationGuard, StrictAuthenticationGuard)
+  public async authenticate() {
+    console.log('hit the /authenticate endpoint');
+    return 'authenticated';
+  }
 
   @Post('/login')
   @ApiOkResponse({
@@ -47,14 +52,13 @@ export default class AuthenticationController {
     },
     description: 'User is logged-in.',
   })
-  @ApiResponse({ status: 403, description: 'User is NOT logged-in' })
   public async loginTrackedUser(@Body() loginPayloadDTO: LoginPayloadDTO) {
     console.log('hit the /login endpoint');
 
     return await this._authenticationService.LoginTrackedUser(loginPayloadDTO);
   }
 
-  @Post('/Register')
+  @Post('/register')
   public async register(@Body() registerPayloadDTO: RegisterPayloadDTO) {
     console.log('hit the /Register endpoint');
 

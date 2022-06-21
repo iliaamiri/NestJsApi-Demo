@@ -23,8 +23,8 @@ export default class TokenRepository implements ITokenRepository {
 
   public async GetToken(
     tokenValue: string,
-  ): Promise<undefined | JWTTokenRawDataDTO> {
-    return TokenDic.AllTokens.get(tokenValue);
+  ): Promise<false | JWTTokenRawDataDTO> {
+    return TokenDic.AllTokens.get(tokenValue) || false;
   }
 
   public async RemoveToken(tokenValue: string): Promise<boolean> {
