@@ -10,12 +10,12 @@ async function getApp() {
   app.setGlobalPrefix('api/v1');
 
   // Cors
-  // app.enableCors({
-  //   origin: '*',
-  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  //   allowedHeaders: 'Content-Type, Authorization, X-Requested-With',
-  //   exposedHeaders: 'X-Total-Count',
-  // });
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization, X-Requested-With',
+    exposedHeaders: 'X-Total-Count',
+  });
 
   const config = SwaggerConfig.getConfig();
 
